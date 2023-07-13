@@ -22,7 +22,7 @@ object data_assembler {
   private def decodeUrlAndGetDomain: UserDefinedFunction = udf((url: String) => {
 
     Try {
-      new URL(URLDecoder.decode(url, "UTF-8")).getHost
+      new URL(URLDecoder.decode(url, "UTF-8")).getHost.replace("www.", "")
 
     }
       .getOrElse("")
@@ -159,6 +159,7 @@ object data_assembler {
       .groupBy("uid", "gender", "age_cat")
       .pivot("cat")
       .agg(sum(col("counter")))
+      .drop("null")
 
     writeStage.write
       .format("jdbc")
